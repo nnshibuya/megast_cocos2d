@@ -77,6 +77,7 @@ public:
     virtual const char* getText(void)override;
 
     virtual void doAnimationWhenKeyboardMove(float duration, float distance) override;
+    virtual void setLeaveKeyboardOpen(bool open) override;
 private:
     UIFont*         constructFont(const char* fontName, int fontSize);
     

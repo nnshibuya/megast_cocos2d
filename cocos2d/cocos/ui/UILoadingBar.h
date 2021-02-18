@@ -175,6 +175,9 @@ public:
     virtual Node* getVirtualRenderer() override;
     virtual std::string getDescription() const override;
 
+    virtual void setGlobalZOrder(float globalZOrder) override;
+    virtual void setGlobalZOrderCascade(float globalZOrder) override;
+
     ResourceData getRenderFile(); 
 
 protected:

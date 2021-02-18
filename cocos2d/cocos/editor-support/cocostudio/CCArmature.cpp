@@ -735,5 +735,11 @@ cpShape *Armature::getShapeList()
 }
 #endif
 
+void Armature::setGlobalZOrder(float zOrder)
+{
+    for (auto bone : _boneDic) {
+        bone.second->setGlobalZOrder(zOrder);
+    }
+}
 
 }

@@ -214,6 +214,12 @@ void EditBoxImplIOS::nativeCloseKeyboard()
     [_systemControl closeKeyboard];
 }
     
+void EditBoxImplIOS::setLeaveKeyboardOpen(bool open)
+{
+    CCEAGLView *eaglview = static_cast<CCEAGLView *>(cocos2d::Director::getInstance()->getOpenGLView()->getEAGLView());
+    [eaglview setLeaveKeyboardOpen:open];
+}
+
 UIFont* EditBoxImplIOS::constructFont(const char *fontName, int fontSize)
 {
     CCASSERT(fontName != nullptr, "fontName can't be nullptr");

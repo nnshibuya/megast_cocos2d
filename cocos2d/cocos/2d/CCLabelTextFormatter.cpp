@@ -147,7 +147,8 @@ void Label::updateBMFontScale()
     }
 }
 
-bool Label::multilineTextWrap(const std::function<int(const std::u32string&, int, int)>& nextTokenLen)
+bool Label::multilineTextWrap(const std::function<int(const std::u32string&, int, int)>& nextTokenLen,
+                              bool forceOneLineBreak, int maxLineNumber)
 {
     int textLen = getStringLength();
     int lineIndex = 0;
@@ -218,6 +219,12 @@ bool Label::multilineTextWrap(const std::function<int(const std::u32string&, int
             if (_enableWrap && _maxLineWidth > 0.f && nextTokenX > 0.f && letterX + letterDef.width * _bmfontScale > _maxLineWidth
                 && !StringUtils::isUnicodeSpace(character) && nextChangeSize)
             {
+                if (maxLineNumber > 0 && maxLineNumber <= lineIndex + 1)
+                {
+                    recordPlaceholderInfo(index, character);
+                    continue;
+                }
+                
                 _linesWidth.push_back(letterRight - whitespaceWidth);
                 nextWhitespaceWidth = 0.f;
                 letterRight = 0.f;
@@ -229,7 +236,26 @@ bool Label::multilineTextWrap(const std::function<int(const std::u32string&, int
             }
             else
             {
-                letterPosition.x = letterX;
+                if (forceOneLineBreak && _maxLineWidth > 0.f && nextTokenX == 0.f && nextLetterX > 0.f && letterX + letterDef.width > _maxLineWidth)
+                {
+                    if (maxLineNumber > 0 && maxLineNumber <= lineIndex + 1)
+                    {
+                        recordPlaceholderInfo(index, character);
+                        continue;
+                    }
+                    _linesWidth.push_back(letterRight);
+                    if (longestLine < nextLetterX)
+                        longestLine = nextLetterX;
+                    letterRight = 0.f;
+                    lineIndex++;
+                    nextLetterX = 0.f;
+                    nextTokenY -= _lineHeight + lineSpacing;
+                    letterPosition.x = letterDef.offsetX / contentScaleFactor;
+                }
+                else
+                {
+                    letterPosition.x = letterX;
+                }
             }
             letterPosition.y = (nextTokenY - letterDef.offsetY * _bmfontScale) / contentScaleFactor;
             recordLetterInfo(letterPosition, character, letterIndex, lineIndex);
@@ -314,12 +340,240 @@ bool Label::multilineTextWrap(const std::function<int(const std::u32string&, int
 
 bool Label::multilineTextWrapByWord()
 {
-    return multilineTextWrap(CC_CALLBACK_3(Label::getFirstWordLen, this));
+    int textLen = getStringLength();
+    int lineIndex = 0;
+    float nextWordX = 0.f;
+    float nextWordY = 0.f;
+    float longestLine = 0.f;
+    float letterRight = 0.f;
+    
+    auto contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
+    float lineSpacing = _lineSpacing * contentScaleFactor;
+    float highestY = 0.f;
+    float lowestY = 0.f;
+    FontLetterDefinition letterDef;
+    Vec2 letterPosition;
+    
+    for (int index = 0; index < textLen; )
+    {
+        auto character = _utf16Text[index];
+        if (character == '\n')
+        {
+            _linesWidth.push_back(letterRight);
+            letterRight = 0.f;
+            lineIndex++;
+            nextWordX = 0.f;
+            nextWordY -= _lineHeight + lineSpacing;
+            recordPlaceholderInfo(index, character);
+            index++;
+            continue;
+        }
+        
+        auto wordLen = getFirstWordLen(_utf16Text, index, textLen);
+        float wordHighestY = highestY;;
+        float wordLowestY = lowestY;
+        float wordRight = letterRight;
+        float nextLetterX = nextWordX;
+        bool newLine = false;
+        for (int tmp = 0; tmp < wordLen;++tmp)
+        {
+            int letterIndex = index + tmp;
+            character = _utf16Text[letterIndex];
+            if (character == '\r')
+            {
+                recordPlaceholderInfo(letterIndex, character);
+                continue;
+            }
+            if (_fontAtlas->getLetterDefinitionForChar(character, letterDef) == false)
+            {
+                recordPlaceholderInfo(letterIndex, character);
+                CCLOG("LabelTextFormatter error:can't find letter definition in font file for letter: %c", character);
+                continue;
+            }
+            
+            auto letterX = (nextLetterX + letterDef.offsetX) / contentScaleFactor;
+            if (_maxLineWidth > 0.f && nextWordX > 0.f && letterX + letterDef.width > _maxLineWidth)
+            {
+                _linesWidth.push_back(letterRight);
+                letterRight = 0.f;
+                lineIndex++;
+                nextWordX = 0.f;
+                nextWordY -= _lineHeight + lineSpacing;
+                newLine = true;
+                break;
+            }
+            else
+            {
+                if (_forceOneLineBreak && _maxLineWidth > 0.f && nextWordX == 0.f && nextLetterX > 0.f && letterX + letterDef.width > _maxLineWidth)
+                {
+                    _linesWidth.push_back(letterRight);
+                    if (longestLine < nextLetterX)
+                        longestLine = nextLetterX;
+                    letterRight = 0.f;
+                    lineIndex++;
+                    nextLetterX = 0.f;
+                    nextWordY -= _lineHeight + lineSpacing;
+                    letterPosition.x = letterDef.offsetX / contentScaleFactor;
+                }
+                else
+                {
+                    letterPosition.x = letterX;
+                }
+            }
+            letterPosition.y = (nextWordY - letterDef.offsetY) / contentScaleFactor;
+            recordLetterInfo(letterPosition, character, letterIndex, lineIndex);
+            
+            if (_horizontalKernings && letterIndex < textLen - 1)
+                nextLetterX += _horizontalKernings[letterIndex + 1];
+            nextLetterX += letterDef.xAdvance + _additionalKerning;
+            
+            wordRight = letterPosition.x + letterDef.width;
+            
+            if (wordHighestY < letterPosition.y)
+                wordHighestY = letterPosition.y;
+            if (wordLowestY > letterPosition.y - letterDef.height)
+                wordLowestY = letterPosition.y - letterDef.height;
+        }
+        
+        if (newLine)
+        {
+            continue;
+        }
+        
+        nextWordX = nextLetterX;
+        letterRight = wordRight;
+        if (highestY < wordHighestY)
+            highestY = wordHighestY;
+        if (lowestY > wordLowestY)
+            lowestY = wordLowestY;
+        if (longestLine < letterRight)
+            longestLine = letterRight;
+        
+        index += wordLen;
+    }
+    
+    _linesWidth.push_back(letterRight);
+    
+    _numberOfLines = lineIndex + 1;
+    _textDesiredHeight = (_numberOfLines * _lineHeight) / contentScaleFactor;
+    if (_numberOfLines > 1)
+        _textDesiredHeight += (_numberOfLines - 1) * _lineSpacing;
+    Size contentSize(_labelWidth, _labelHeight);
+    if (_labelWidth <= 0.f)
+        contentSize.width = longestLine;
+    if (_labelHeight <= 0.f)
+        contentSize.height = _textDesiredHeight;
+    setContentSize(contentSize);
+    
+    _tailoredTopY = contentSize.height;
+    _tailoredBottomY = 0.f;
+    if (highestY > 0.f)
+        _tailoredTopY = contentSize.height + highestY;
+    if (lowestY < -_textDesiredHeight)
+        _tailoredBottomY = _textDesiredHeight + lowestY;
+    
+    return true;
 }
 
 bool Label::multilineTextWrapByChar()
 {
-    return multilineTextWrap(CC_CALLBACK_3(Label::getFirstCharLen, this));
+    int textLen = getStringLength();
+    int lineIndex = 0;
+    float nextLetterX = 0.f;
+    float nextLetterY = 0.f;
+    float longestLine = 0.f;
+    float letterRight = 0.f;
+    
+    auto contentScaleFactor = CC_CONTENT_SCALE_FACTOR();
+    float lineSpacing = _lineSpacing * contentScaleFactor;
+    float highestY = 0.f;
+    float lowestY = 0.f;
+    FontLetterDefinition letterDef;
+    Vec2 letterPosition;
+    
+    for (int index = 0; index < textLen; index++)
+    {
+        auto character = _utf16Text[index];
+        if (character == '\r')
+        {
+            recordPlaceholderInfo(index, character);
+            continue;
+        }
+        if (character == '\n')
+        {
+            _linesWidth.push_back(letterRight);
+            letterRight = 0.f;
+            lineIndex++;
+            nextLetterX = 0.f;
+            nextLetterY -= _lineHeight + lineSpacing;
+            recordPlaceholderInfo(index, character);
+            continue;
+        }
+        
+        if (_fontAtlas->getLetterDefinitionForChar(character, letterDef) == false)
+        {
+            recordPlaceholderInfo(index, character);
+            CCLOG("LabelTextFormatter error:can't find letter definition in font file for letter: %c", character);
+            continue;
+        }
+        
+        auto letterX = (nextLetterX + letterDef.offsetX) / contentScaleFactor;
+        if (_maxLineWidth > 0.f && nextLetterX > 0.f && letterX + letterDef.width > _maxLineWidth)
+        {
+            if (_maxLineNumber > 0 && _maxLineNumber <= lineIndex + 1)
+            {
+                recordPlaceholderInfo(index, character);
+                continue;
+            }
+            _linesWidth.push_back(letterRight);
+            letterRight = 0.f;
+            lineIndex++;
+            nextLetterX = 0.f;
+            nextLetterY -= _lineHeight + lineSpacing;
+            letterPosition.x = letterDef.offsetX / contentScaleFactor;
+        }
+        else
+        {
+            letterPosition.x = letterX;
+        }
+        letterPosition.y = (nextLetterY - letterDef.offsetY) / contentScaleFactor;
+        recordLetterInfo(letterPosition, character, index, lineIndex);
+        
+        if (_horizontalKernings && index < textLen - 1)
+            nextLetterX += _horizontalKernings[index + 1];
+        nextLetterX += letterDef.xAdvance + _additionalKerning;
+        
+        letterRight = letterPosition.x + letterDef.width;
+        
+        if (highestY < letterPosition.y)
+            highestY = letterPosition.y;
+        if (lowestY > letterPosition.y - letterDef.height)
+            lowestY = letterPosition.y - letterDef.height;
+        if (longestLine < letterRight)
+            longestLine = letterRight;
+    }
+    
+    _linesWidth.push_back(letterRight);
+    
+    _numberOfLines = lineIndex + 1;
+    _textDesiredHeight = (_numberOfLines * _lineHeight) / contentScaleFactor;
+    if (_numberOfLines > 1)
+        _textDesiredHeight += (_numberOfLines - 1) * _lineSpacing;
+    Size contentSize(_labelWidth, _labelHeight);
+    if (_labelWidth <= 0.f)
+        contentSize.width = longestLine;
+    if (_labelHeight <= 0.f)
+        contentSize.height = _textDesiredHeight;
+    setContentSize(contentSize);
+    
+    _tailoredTopY = contentSize.height;
+    _tailoredBottomY = 0.f;
+    if (highestY > 0.f)
+        _tailoredTopY = contentSize.height + highestY;
+    if (lowestY < -_textDesiredHeight)
+        _tailoredBottomY = _textDesiredHeight + lowestY;
+    
+    return true;
 }
 
 bool Label::isVerticalClamp()

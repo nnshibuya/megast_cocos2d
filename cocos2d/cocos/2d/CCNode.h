@@ -166,8 +166,9 @@ public:
      */
     virtual void setLocalZOrder(std::int32_t localZOrder);
 
-    CC_DEPRECATED_ATTRIBUTE virtual void setZOrder(std::int32_t localZOrder) { setLocalZOrder(localZOrder); }
-    
+    // CC_DEPRECATED_ATTRIBUTE virtual void setZOrder(std::int32_t localZOrder) { setLocalZOrder(localZOrder); }
+    virtual void setZOrder(std::int32_t localZOrder) { setLocalZOrder(localZOrder); }
+
     /* 
      Helper function used by `setLocalZOrder`. Don't use it unless you know what you are doing.
      @js NA
@@ -196,7 +197,8 @@ public:
 
     virtual std::int32_t getLocalZOrder() const { return _localZOrder; }
 
-    CC_DEPRECATED_ATTRIBUTE virtual std::int32_t getZOrder() const { return getLocalZOrder(); }
+    // CC_DEPRECATED_ATTRIBUTE virtual std::int32_t getZOrder() const { return getLocalZOrder(); }
+    virtual std::int32_t getZOrder() const { return getLocalZOrder(); }
 
     /**
      Defines the order in which the nodes are renderer.
@@ -228,6 +230,9 @@ public:
      * @return The node's global Z order
      */
     virtual float getGlobalZOrder() const { return _globalZOrder; }
+
+    //子までGZOrderをセットする k-sasaki
+    virtual void setGlobalZOrderCascade(float globalZOrder);
 
     /**
      * Sets the scale (x) of the node.
@@ -582,6 +587,11 @@ public:
      */
     virtual bool isVisible() const;
 
+    /**
+     *  自分の親Nodeを全て辿り、一つでもisVisible()がfalseを返すNodeが存在したらfalseを返す
+     *  m-sakamotoが追加しました
+     */
+    virtual bool isVisibleRecursively() const;
 
     /**
      * Sets the rotation (angle) of the node in degrees.
@@ -755,7 +765,7 @@ public:
      * 
      * Please use `addChild(Node* child, int localZOrder, const std::string &name)` instead.
      */
-     virtual void addChild(Node* child, int localZOrder, int tag);
+     virtual void addChild(Node* child, int localZOrder, int64_t tag);
     /**
      * Adds a child to the container with z order and tag
      *
@@ -776,7 +786,7 @@ public:
      *
      * Please use `getChildByName()` instead.
      */
-     virtual Node * getChildByTag(int tag) const;
+     virtual Node * getChildByTag(int64_t tag) const;
     
      /**
      * Gets a child from the container with its tag that can be cast to Type T.
@@ -900,7 +910,7 @@ public:
      *
      * Please use `removeChildByName` instead.
      */
-     virtual void removeChildByTag(int tag, bool cleanup = true);
+     virtual void removeChildByTag(int64_t tag, bool cleanup = true);
     /**
      * Removes a child from the container by tag value. It will also cleanup all running actions depending on the cleanup parameter.
      *
@@ -969,7 +979,7 @@ public:
      *
      * Please use `getTag()` instead.
      */
-     virtual int getTag() const;
+     virtual int64_t getTag() const;
     /**
      * Changes the tag that is used to identify the node easily.
      *
@@ -979,7 +989,7 @@ public:
      *
      * Please use `setName()` instead.
      */
-     virtual void setTag(int tag);
+     virtual void setTag(int64_t tag);
     
     /** Returns a string that is used to identify the node.
      * @return A string that identifies the node.
@@ -1699,6 +1709,12 @@ public:
     Component* getComponent(const std::string& name);
 
     /**
+     * getComponent関数のconst版。既存のコードへの影響が怖いので、オーバーロードにはしなかった
+     * m-sakamoto
+     */
+    const Component* getImmutableComponent(const std::string& name) const;
+
+    /**
      * Adds a component.
      *
      * @param component A given component.
@@ -1760,6 +1776,9 @@ public:
      * @param cascadeOpacityEnabled True to enable cascadeOpacity, false otherwise.
      */
     virtual void setCascadeOpacityEnabled(bool cascadeOpacityEnabled);
+
+    //追加されていたメソッド
+    virtual void setCascadeOpacityEnabledRecursive(bool cascadeOpacityEnabled);
 
     /**
      * Query node's color value.
@@ -1898,7 +1917,7 @@ protected:
     void updateRotation3D();
     
 private:
-    void addChildHelper(Node* child, int localZOrder, int tag, const std::string &name, bool setTag);
+    void addChildHelper(Node* child, int localZOrder, int64_t tag, const std::string &name, bool setTag);
     
 protected:
 
@@ -1966,7 +1985,7 @@ protected:
     Vector<Node*> _children;        ///< array of children nodes
     Node *_parent;                  ///< weak reference to parent node
     Director* _director;            //cached director pointer to improve rendering performance
-    int _tag;                       ///< a tag. Can be any number you assigned just to identify this node
+    int64_t _tag;                       ///< a tag. Can be any number you assigned just to identify this node
     
     std::string _name;              ///<a string label, an user defined string to identify this node
     size_t _hashOfName;             ///<hash value of _name, used for speed in getChildByName

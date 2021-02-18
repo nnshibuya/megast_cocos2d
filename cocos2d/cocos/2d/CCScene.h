@@ -220,7 +220,9 @@ public:
     * Set NavMesh debug draw camera.
     */
     void setNavMeshDebugCamera(Camera *camera);
-
+    
+    virtual void applicationWillResignActive();
+    
 protected:
     NavMesh*        _navMesh;
     Camera *        _navMeshDebugCamera;

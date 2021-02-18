@@ -466,6 +466,11 @@ void TableView::_updateCellPositions()
 
 }
 
+void TableView::deaccelerateScrolling(float dt)
+{
+    ScrollView::deaccelerateScrolling(dt);
+}
+
 void TableView::scrollViewDidScroll(ScrollView* /*view*/)
 {
     long countOfItems = _dataSource->numberOfCellsInTableView(this);

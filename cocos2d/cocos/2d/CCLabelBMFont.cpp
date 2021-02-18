@@ -186,7 +186,7 @@ const BlendFunc &LabelBMFont::getBlendFunc() const
     return _label->getBlendFunc();
 }
 
-Node* LabelBMFont::getChildByTag(int tag) const
+Node* LabelBMFont::getChildByTag(int64_t tag) const
 {
     return _label->getLetter(tag);
 }

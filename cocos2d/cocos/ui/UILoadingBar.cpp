@@ -405,6 +405,18 @@ std::string LoadingBar::getDescription() const
     return "LoadingBar";
 }
 
+void LoadingBar::setGlobalZOrder(float globalZOrder)
+{
+    Node::setGlobalZOrder(globalZOrder);
+    getVirtualRenderer()->setGlobalZOrder(globalZOrder);
+}
+    
+void LoadingBar::setGlobalZOrderCascade(float globalZOrder)
+{
+    Node::setGlobalZOrderCascade(globalZOrder);
+    getVirtualRenderer()->setGlobalZOrder(globalZOrder);
+}
+
 Widget* LoadingBar::createCloneInstance()
 {
     return LoadingBar::create();

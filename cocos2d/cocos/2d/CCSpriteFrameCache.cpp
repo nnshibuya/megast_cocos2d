@@ -547,6 +547,32 @@ SpriteFrame* SpriteFrameCache::getSpriteFrameByName(const std::string& name)
     return frame;
 }
 
+#pragma mark 笠間追加
+bool SpriteFrameCache::isSpriteFrameLoadedByName(const std::string& name)
+{
+    bool loaded = false;
+    SpriteFrame* frame = _spriteFrames.at(name);
+    if (frame)
+    {
+        loaded = true;
+    }
+    else
+    {
+        std::string key = _spriteFramesAliases[name].asString();
+        if (!key.empty())
+        {
+            frame = _spriteFrames.at(key);
+            if (frame)
+            {
+                loaded = true;
+            }
+        }
+    }
+    
+    return loaded;
+}
+#pragma mark ここまで
+
 void SpriteFrameCache::reloadSpriteFramesWithDictionary(ValueMap& dictionary, Texture2D *texture, const std::string &plist)
 {
     ValueMap& framesDict = dictionary["frames"].asValueMap();

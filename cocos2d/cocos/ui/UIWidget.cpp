@@ -822,6 +822,16 @@ void Widget::propagateTouchEvent(cocos2d::ui::Widget::TouchEventType event, coco
 
 void Widget::onTouchMoved(Touch *touch, Event* /*unusedEvent*/)
 {
+    //追加 : 西村  iPhone6Sなどのタッチの強さが取れるようになった関係で、強く押すとMovedが呼ばれてしまう。呼ばれないように対応した
+    //if(touch->getLocation() == touch->getPreviousLocation()) return;
+    //追加 : 星山  ロジックの変更
+    auto range = touch->getLocation().distanceSquared(_touchBeganPosition);
+    //log("Widget::onTouchMoved %f", range);
+    if(range < (8.0f * 8.0f))
+    {
+        return;
+    }
+
     _touchMovePosition = touch->getLocation();
 
     setHighlighted(hitTest(_touchMovePosition, _hittedByCamera, nullptr));
@@ -970,7 +980,11 @@ void Widget::addCCSEventListener(const ccWidgetEventCallback &callback)
 bool Widget::hitTest(const Vec2 &pt, const Camera* camera, Vec3 *p) const
 {
     Rect rect;
-    rect.size = getContentSize();
+    if(getHitSize().width == 0 || getHitSize().height == 0 ){
+        rect.size = getContentSize();
+    }else{
+        rect.size = getHitSize();
+    }
     return isScreenPointInRect(pt, camera, getWorldToNodeTransform(), rect, p);
 }
 
@@ -1529,6 +1543,21 @@ bool Widget::isLayoutComponentEnabled()const
     return _usingLayoutComponent;
 }
 
+//t-harada　v3.6時追加
+bool Widget::isHitOnTouchEnabled(Touch *touch, Event *unusedEvent)
+{
+    if (isVisible() && isEnabled() && isAncestorsEnabled() && isAncestorsVisible(this) )
+    {
+        auto touchpos = touch->getLocation();
+        auto camera = Camera::getDefaultCamera();
+        if(hitTest(touchpos,camera,nullptr) && isClippingParentContainsPoint(touchpos))
+        {
+            return true;
+        }
+    }
+    
+    return false;
+}
 
 
 }

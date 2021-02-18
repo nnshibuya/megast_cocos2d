@@ -90,6 +90,10 @@ public class Cocos2dxWebViewHelper {
             @Override
             public void run() {
                 Cocos2dxWebView webView = new Cocos2dxWebView(sCocos2dxActivity, index);
+                //2016.07.10 shinnaga webview生成時にキャッシュをクリア
+                webView.clearCache(true);
+                //2016.07.26 shinnaga webviewと判別できるようにUAを追加
+                webView.getSettings().setUserAgentString("WebView Android Mozilla/5.0 (Linux; Android 5.1.1; Nexus 5 Build/LMY48M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36");
                 FrameLayout.LayoutParams lParams = new FrameLayout.LayoutParams(
                         FrameLayout.LayoutParams.WRAP_CONTENT,
                         FrameLayout.LayoutParams.WRAP_CONTENT);
@@ -251,6 +255,8 @@ public class Cocos2dxWebViewHelper {
                 if (webView != null) {
                     webView.getSettings().setCacheMode(cleanCachedData ? WebSettings.LOAD_NO_CACHE
                                                                        : WebSettings.LOAD_DEFAULT);
+                    //2016.07.10 shinnaga webviewの背景色を透明に
+                    webView.setBackgroundColor(0);
                     webView.loadUrl(url);
                 }
             }
@@ -263,6 +269,8 @@ public class Cocos2dxWebViewHelper {
             public void run() {
                 Cocos2dxWebView webView = webViews.get(index);
                 if (webView != null) {
+                    //2016.07.10 shinnaga webviewの背景色を透明に
+                    webView.setBackgroundColor(0);
                     webView.loadUrl(filePath);
                 }
             }

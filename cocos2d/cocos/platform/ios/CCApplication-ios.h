@@ -99,6 +99,8 @@ public:
      */
     virtual bool openURL(const std::string &url) override;
 
+    bool checkOpenURL(const std::string &url);
+
     /**
     @brief  This function will be called when the application screen size is changed.
     @param new width

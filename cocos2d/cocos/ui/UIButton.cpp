@@ -50,7 +50,7 @@ _buttonNormalRenderer(nullptr),
 _buttonClickedRenderer(nullptr),
 _buttonDisabledRenderer(nullptr),
 _titleRenderer(nullptr),
-_zoomScale(0.1f),
+_zoomScale(0.05f),
 _prevIgnoreSize(true),
 _scale9Enabled(false),
 _pressedActionEnabled(false),
@@ -60,6 +60,8 @@ _capInsetsDisabled(Rect::ZERO),
 _normalTextureSize(_contentSize),
 _pressedTextureSize(_contentSize),
 _disabledTextureSize(_contentSize),
+_normalTextureScaleXInSize(1.0f),
+_normalTextureScaleYInSize(1.0f),
 _normalTextureLoaded(false),
 _pressedTextureLoaded(false),
 _disabledTextureLoaded(false),
@@ -470,7 +472,7 @@ void Button::onPressStateChangedToNormal()
             _buttonNormalRenderer->stopAllActions();
             _buttonClickedRenderer->stopAllActions();
 
-//            Action *zoomAction = ScaleTo::create(ZOOM_ACTION_TIME_STEP, _normalTextureScaleXInSize, _normalTextureScaleYInSize);
+            Action *zoomAction = ScaleTo::create(ZOOM_ACTION_TIME_STEP, _normalTextureScaleXInSize, _normalTextureScaleYInSize);
             //fixme: the zoomAction will run in the next frame which will cause the _buttonNormalRenderer to a wrong scale
             _buttonNormalRenderer->setScale(1.0);
             _buttonClickedRenderer->setScale(1.0);
@@ -494,7 +496,9 @@ void Button::onPressStateChangedToNormal()
     else
     {
         _buttonNormalRenderer->stopAllActions();
-        _buttonNormalRenderer->setScale(1.0);
+        _buttonNormalRenderer->runAction(Spawn::create(ScaleTo::create(0, _normalTextureScaleXInSize, _normalTextureScaleYInSize),
+                                                       TintTo::create(0.05, 255, 255, 255),
+                                                       NULL));
 
         if (nullptr != _titleRenderer)
         {
@@ -546,6 +550,7 @@ void Button::onPressStateChangedToPressed()
 
         _buttonNormalRenderer->stopAllActions();
         _buttonNormalRenderer->setScale(1.0f +_zoomScale, 1.0f + _zoomScale);
+        _buttonNormalRenderer->setColor(Color3B(128, 128, 128));
 
         if (nullptr != _titleRenderer)
         {

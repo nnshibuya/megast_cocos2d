@@ -66,7 +66,7 @@ bool BatchNode::init()
     return ret;
 }
 
-void BatchNode::addChild(Node *child, int zOrder, int tag)
+void BatchNode::addChild(Node *child, int zOrder, int64_t tag)
 {
     Node::addChild(child, zOrder, tag);
     Armature *armature = dynamic_cast<Armature *>(child);

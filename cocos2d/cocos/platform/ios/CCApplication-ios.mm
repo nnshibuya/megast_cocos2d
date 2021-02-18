@@ -137,6 +137,13 @@ bool Application::openURL(const std::string &url)
     return [[UIApplication sharedApplication] openURL:nsUrl];
 }
 
+bool Application::checkOpenURL(const std::string &url)
+{
+    NSString* msg = [NSString stringWithCString:url.c_str() encoding:NSUTF8StringEncoding];
+    NSURL* nsUrl = [NSURL URLWithString:msg];
+    return [[UIApplication sharedApplication] canOpenURL:nsUrl];
+}
+
 void Application::applicationScreenSizeChanged(int newWidth, int newHeight) {
 
 }

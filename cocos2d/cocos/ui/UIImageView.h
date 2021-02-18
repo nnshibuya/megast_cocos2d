@@ -143,6 +143,11 @@ public:
     virtual Size getVirtualRendererSize() const override;
     virtual Node* getVirtualRenderer() override;
 
+    /**
+     GlobalZorderが機能するように追加 k-sasaki
+     */
+    virtual void setGlobalZOrder(float globalZOrder) override;
+
     ResourceData getRenderFile();
 
     virtual void setGLProgram(GLProgram* glProgram) override;

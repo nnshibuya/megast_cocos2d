@@ -91,6 +91,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 @synthesize context=context_;
 @synthesize multiSampling=multiSampling_;
 @synthesize isKeyboardShown=isKeyboardShown_;
+@synthesize isLeaveKeyboardOpen=isLeaveKeyboardOpen_;
 @synthesize keyboardShowNotification = keyboardShowNotification_;
 + (Class) layerClass
 {
@@ -211,6 +212,11 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
     return (int)bound.height * self.contentScaleFactor;
 }
 
+-(CGRect) getStatusBarRect
+{
+    CGRect statusRect = [[UIApplication sharedApplication] statusBarFrame];
+    return statusRect;
+}
 
 -(BOOL) setupSurfaceWithSharegroup:(EAGLSharegroup*)sharegroup
 {
@@ -403,7 +409,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 #pragma mark CCEAGLView - Touch Delegate
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    if (isKeyboardShown_)
+    if (isKeyboardShown_ && !isLeaveKeyboardOpen_)
     {
         [self handleTouchesAfterKeyboardShow];
     }
@@ -872,6 +878,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
         caretRect_ = CGRectZero;
         dispatcher->dispatchKeyboardDidHide(notiInfo);
         isKeyboardShown_ = NO;
+        isLeaveKeyboardOpen_ = NO;
     }
 }
 #endif
@@ -939,6 +946,11 @@ UIInterfaceOrientation getFixedOrientation(UIInterfaceOrientation statusBarOrien
     {
         [[NSNotificationCenter defaultCenter]postNotification:self.keyboardShowNotification];
     }
+}
+
+-(void) setLeaveKeyboardOpen:(BOOL)open
+{
+    isLeaveKeyboardOpen_ = open;
 }
 
 @end

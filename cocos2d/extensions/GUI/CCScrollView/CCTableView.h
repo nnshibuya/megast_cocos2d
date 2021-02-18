@@ -275,6 +275,7 @@ public:
     virtual void onTouchMoved(Touch *pTouch, Event *pEvent) override;
     virtual void onTouchEnded(Touch *pTouch, Event *pEvent) override;
     virtual void onTouchCancelled(Touch *pTouch, Event *pEvent) override;
+    virtual void deaccelerateScrolling(float dt) override;
 
 protected:
     long __indexFromOffset(Vec2 offset);

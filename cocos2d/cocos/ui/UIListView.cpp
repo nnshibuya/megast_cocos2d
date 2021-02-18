@@ -274,7 +274,7 @@ void ListView::pushBackCustomItem(Widget* item)
     requestDoLayout();
 }
     
-void ListView::addChild(cocos2d::Node *child, int zOrder, int tag)
+void ListView::addChild(cocos2d::Node *child, int zOrder, int64_t tag)
 {
     ScrollView::addChild(child, zOrder, tag);
 

@@ -112,6 +112,12 @@ private:
 
     GlyphCollection _usedGlyphs;
     std::string _customGlyphs;
+
+#ifndef LANG_EN
+    //アイヌフォント対応
+    FontFreeType* _ainu_fft;
+#endif
+
 };
 
 /// @endcond

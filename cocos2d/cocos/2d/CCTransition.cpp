@@ -1258,8 +1258,8 @@ void TransitionFade :: onEnter()
     LayerColor* l = LayerColor::create(_color);
     _inScene->setVisible(false);
 
-    addChild(l, 2, kSceneFade);
-    Node* f = getChildByTag(kSceneFade);
+    addChild(l, 2, static_cast<int64_t>(kSceneFade));
+    Node* f = getChildByTag(static_cast<int64_t>(kSceneFade));
 
     auto a = Sequence::create
         (

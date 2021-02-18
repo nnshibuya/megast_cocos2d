@@ -73,7 +73,7 @@ BoneNode* BoneNode::create(int length)
     return ret;
 }
 
-void BoneNode::addChild(cocos2d::Node* child, int localZOrder, int tag)
+void BoneNode::addChild(cocos2d::Node* child, int localZOrder, int64_t tag)
 {
     addToChildrenListHelper(child);
     Node::addChild(child, localZOrder, tag);

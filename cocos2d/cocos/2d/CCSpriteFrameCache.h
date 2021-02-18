@@ -281,6 +281,26 @@ public:
      * @return The sprite frame.
      */
     SpriteFrame* getSpriteFrameByName(const std::string& name);
+    
+  #pragma mark 笠間追加
+    /**
+     * 該当ファイル名の画像がSpriteFrameに読み込まれているかチェックする。
+     *
+     * @param name ファイル名
+     * @return bool チェック結果
+     */
+    bool isSpriteFrameLoadedByName(const std::string& name);
+#pragma mark ここまで
+    
+    int getSpriteFrames(){
+        return (int)_spriteFrames.size();
+    }
+    int getLoadedFileNames(){
+        if(_loadedFileNames)    {
+            return (int)_loadedFileNames->size();
+        }
+        return 0;
+    }
 
     /** @deprecated use getSpriteFrameByName() instead */
     CC_DEPRECATED_ATTRIBUTE SpriteFrame* spriteFrameByName(const std::string&name) { return getSpriteFrameByName(name); }

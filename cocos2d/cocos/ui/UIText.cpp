@@ -420,6 +420,10 @@ const BlendFunc& Text::getBlendFunc() const
     return _labelRenderer->getBlendFunc();
 }
     
+void Text::setGlobalZOrder(float order){
+    _labelRenderer->setGlobalZOrder(order);
+}
+
 Widget* Text::createCloneInstance()
 {
     return Text::create();

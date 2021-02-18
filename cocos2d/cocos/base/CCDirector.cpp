@@ -63,9 +63,20 @@ THE SOFTWARE.
 #include "base/CCAsyncTaskPool.h"
 #include "base/ObjectFactory.h"
 #include "platform/CCApplication.h"
+#include "2d/CCSprite.h"
 
 #if CC_ENABLE_SCRIPT_BINDING
 #include "base/CCScriptSupport.h"
+#endif
+
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+#include    "platform/android/jni/JniHelper.h"
+#endif
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+#include <sys/sysctl.h>
+#import <mach/mach.h>
+#import <mach/mach_host.h>
 #endif
 
 /**
@@ -111,6 +122,7 @@ Director* Director::getInstance()
 }
 
 Director::Director()
+: _invalid(true)
 {
 }
 
@@ -121,6 +133,7 @@ bool Director::init()
     _scenesStack.reserve(15);
 
     // FPS
+    _FPSprite = nullptr;
     _lastUpdate = std::chrono::steady_clock::now();
     
     _console = new (std::nothrow) Console;
@@ -165,6 +178,7 @@ Director::~Director()
     CCLOGINFO("deallocing Director: %p", this);
 
     CC_SAFE_RELEASE(_FPSLabel);
+    CC_SAFE_RELEASE(_FPSprite);
     CC_SAFE_RELEASE(_drawnVerticesLabel);
     CC_SAFE_RELEASE(_drawnBatchesLabel);
 
@@ -692,7 +706,7 @@ void Director::setProjection(Projection projection)
 void Director::purgeCachedData(void)
 {
     FontFNT::purgeCachedData();
-    FontAtlasCache::purgeCachedData();
+    // FontAtlasCache::purgeCachedData();
 
     if (s_SharedDirector->getOpenGLView())
     {
@@ -838,6 +852,73 @@ Rect Director::getSafeAreaRect() const
     if (_openGLView)
     {
         return _openGLView->getSafeAreaRect();
+    }
+    else
+    {
+        return Rect::ZERO;
+    }
+}
+
+Size Director::getViewPortSize() const
+{
+    if (_openGLView)
+    {
+        return Size(_openGLView->getVisibleSize().width, _openGLView->getVisibleSize().height - getStatusBarRect().size.height);
+    }
+    else
+    {
+        return Size::ZERO;
+    }
+}
+
+Rect Director::getStatusBarRect() const
+{
+    if (_openGLView)
+    {
+        Size visibleSize = _openGLView->getVisibleSize();
+#if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+        if(_openGLView->getStatusBarRect().size.width > 0){
+            return Rect(_openGLView->getStatusBarRect().origin.x,
+                        _openGLView->getStatusBarRect().origin.y,
+                        visibleSize.width,
+                        _openGLView->getStatusBarRect().size.height * (visibleSize.width / _openGLView->getStatusBarRect().size.width));
+        }else{
+            return Rect::ZERO;
+        }
+#endif
+        
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
+        {
+            JniMethodInfo    jnimi;
+            int                wd = 0;
+            int                ht = 0;
+            
+            if( JniHelper::getStaticMethodInfo(jnimi,"org/cocos2dx/cpp/AppActivity","get_statusbar_size","([I[I)V") )
+            {
+                /* java側関数コール */
+                JNIEnv*        jnienv = JniHelper::getEnv();
+                jintArray    wdjia = jnienv->NewIntArray( 2 );
+                jintArray    htjia = jnienv->NewIntArray( 2 );
+                
+                jnimi.env->CallStaticVoidMethod(    jnimi.classID,jnimi.methodID,
+                                                wdjia,htjia    );
+                jnimi.env->DeleteLocalRef( jnimi.classID );
+                /* 格納 */
+                jnienv->GetIntArrayRegion( wdjia,0,1,reinterpret_cast<jint*>(&wd) );
+                jnienv->GetIntArrayRegion( htjia,0,1,reinterpret_cast<jint*>(&ht) );
+                /* 開放 */
+                jint*    ji;
+                
+                ji = jnienv->GetIntArrayElements( wdjia,0 );
+                jnienv->ReleaseIntArrayElements( wdjia,ji,0 );
+                ji = jnienv->GetIntArrayElements( htjia,0 );
+                jnienv->ReleaseIntArrayElements( htjia,ji,0 );
+                /* 範囲設定 */
+                return( Rect(0,0,wd,ht) );
+            }
+        }
+        return Rect::ZERO;
+#endif
     }
     else
     {
@@ -1071,6 +1152,7 @@ void Director::reset()
     
     CC_SAFE_RELEASE_NULL(_notificationNode);
     CC_SAFE_RELEASE_NULL(_FPSLabel);
+    CC_SAFE_RELEASE_NULL(_FPSprite);
     CC_SAFE_RELEASE_NULL(_drawnBatchesLabel);
     CC_SAFE_RELEASE_NULL(_drawnVerticesLabel);
     
@@ -1258,16 +1340,27 @@ void Director::showStats()
     ++_frames;
     _accumDt += _deltaTime;
     
-    if (_displayStats && _FPSLabel && _drawnBatchesLabel && _drawnVerticesLabel)
+    if (_displayStats && _FPSLabel && _drawnBatchesLabel && _drawnVerticesLabel && _FPSprite)
     {
-        char buffer[30] = {0};
+        char buffer[30*4] = {0};
 
         // Probably we don't need this anymore since
         // the framerate is using a low-pass filter
         // to make the FPS stable
         if (_accumDt > CC_DIRECTOR_STATS_INTERVAL)
         {
-            sprintf(buffer, "%.1f / %.3f", _frames / _accumDt, _secondsPerFrame);
+            int n = 0;
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+            n = sprintf(buffer, "%.1f / %.3f RAM %.1f", _frameRate, _secondsPerFrame, Director::getAvailableMegaBytes());
+#else
+            n = sprintf(buffer, "%.1f / %.3f", _frameRate, _secondsPerFrame);
+#endif
+            {
+                int tex_nums = getTextureCache()->getTextures();
+                   int sp_nums = SpriteFrameCache::getInstance()->getSpriteFrames();
+                int sp_loads = SpriteFrameCache::getInstance()->getLoadedFileNames();
+                sprintf(&buffer[n], " S1:%d S2:%d T:%d ", sp_nums, sp_loads, tex_nums);
+            }
             _FPSLabel->setString(buffer);
             _accumDt = 0;
             _frames = 0;
@@ -1288,7 +1381,8 @@ void Director::showStats()
         }
 
         const Mat4& identity = Mat4::IDENTITY;
-        _drawnVerticesLabel->visit(_renderer, identity, 0);
+        _FPSprite->visit(_renderer, identity, 0);
+        // _drawnVerticesLabel->visit(_renderer, identity, 0);
         _drawnBatchesLabel->visit(_renderer, identity, 0);
         _FPSLabel->visit(_renderer, identity, 0);
     }
@@ -1324,6 +1418,7 @@ void Director::createStatsLabel()
         drawVerticesString = _drawnVerticesLabel->getString();
         
         CC_SAFE_RELEASE_NULL(_FPSLabel);
+        CC_SAFE_RELEASE_NULL(_FPSprite);
         CC_SAFE_RELEASE_NULL(_drawnBatchesLabel);
         CC_SAFE_RELEASE_NULL(_drawnVerticesLabel);
         _textureCache->removeTextureForKey("/cc_fps_images");
@@ -1364,6 +1459,14 @@ void Director::createStatsLabel()
     _FPSLabel->initWithString(fpsString, texture, 12, 32 , '.');
     _FPSLabel->setScale(scaleFactor);
 
+    //back ground
+    _FPSprite = Sprite::create();
+    _FPSprite->retain();
+    _FPSprite->setTextureRect(Rect(0, 0, 570*3, 90));
+    _FPSprite->setColor(Color3B::BLACK);
+    _FPSprite->setOpacity(160);
+    _FPSprite->setPosition(Vec2(0,0));
+    
     _drawnBatchesLabel = LabelAtlas::create();
     _drawnBatchesLabel->retain();
     _drawnBatchesLabel->setIgnoreContentScaleFactor(true);
@@ -1443,6 +1546,49 @@ void Director::setEventDispatcher(EventDispatcher* dispatcher)
         _eventDispatcher = dispatcher;
     }
 }
+
+double Director::getAvailableBytes() {
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+
+#if false
+    vm_statistics_data_t vmStats;
+    mach_msg_type_number_t infoCount = HOST_VM_INFO_COUNT;
+    kern_return_t kernReturn = host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vmStats, &infoCount);
+    
+    if (kernReturn != KERN_SUCCESS)
+    {
+        return 0.0f;
+    }
+    
+    return (vm_page_size * vmStats.free_count);
+#else
+    // T.OOKI メモリ使用量取得、修正
+    // https://nyama41.hatenablog.com/entry/get_unity_ios_application_memory
+    task_vm_info_data_t info;
+    mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
+    if(task_info(mach_task_self(), TASK_VM_INFO, (task_info_t)&info, &count) != KERN_SUCCESS)
+    {
+        return 0.0f;
+    }
+
+    return (long)(info.internal + info.compressed);
+
+#endif
+
+#endif
+    return 0;
+}
+
+double Director::getAvailableKiloBytes()
+{
+    return Director::getAvailableBytes() / 1024.0;
+}
+
+double Director::getAvailableMegaBytes()
+{
+    return Director::getAvailableKiloBytes() / 1024.0;
+}
+
 
 void Director::startAnimation()
 {

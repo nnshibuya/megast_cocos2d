@@ -342,6 +342,15 @@
 - (BOOL)textFieldShouldReturn:(UITextField *)sender
 {
     if (sender == self.textInput) {
+        //キーボードオープンしっぱなしの場合はresignFirstResponderしない
+        auto view = cocos2d::Director::getInstance()->getOpenGLView();
+        CCEAGLView *eaglview = (CCEAGLView *)view->getEAGLView();
+        if (eaglview.isLeaveKeyboardOpen)
+        {
+            getEditBoxImplIOS()->editBoxKeyboardDone();
+            return NO;
+        }
+
         self.returnPressed = YES;
         [sender resignFirstResponder];
     }

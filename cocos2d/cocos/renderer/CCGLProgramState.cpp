@@ -814,8 +814,10 @@ void GLProgramState::setUniformVec4(const std::string& uniformName, const Vec4& 
     auto v = getUniformValue(uniformName);
     if (v)
         v->setVec4(value);
+    /*    ここでエラーログが出続けるのでコメント化、T.OOKI 2020.12.01
     else
         CCLOG("cocos2d: warning: Uniform not found: %s", uniformName.c_str());
+     */
 }
 
 void GLProgramState::setUniformVec4(GLint uniformLocation, const Vec4& value)

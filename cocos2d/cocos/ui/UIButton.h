@@ -369,6 +369,9 @@ protected:
     Size _pressedTextureSize;
     Size _disabledTextureSize;
 
+    float _normalTextureScaleXInSize;
+    float _normalTextureScaleYInSize;
+
     bool _normalTextureLoaded;
     bool _pressedTextureLoaded;
     bool _disabledTextureLoaded;

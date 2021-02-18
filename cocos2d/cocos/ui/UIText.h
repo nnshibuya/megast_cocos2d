@@ -349,6 +349,11 @@ public:
      */
     virtual const BlendFunc &getBlendFunc() const override;
 
+    /**
+     GlobalZorderが機能するように追加 k-sasaki
+     */
+    virtual void setGlobalZOrder(float globalZOrder) override;
+
 CC_CONSTRUCTOR_ACCESS:
     virtual bool init() override;
     virtual bool init(const std::string& textContent,

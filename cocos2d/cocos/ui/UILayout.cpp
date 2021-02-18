@@ -174,7 +174,7 @@ void Layout::addChild(Node * child, int localZOrder)
     Layout::addChild(child, localZOrder, child->getTag());
 }
 
-void Layout::addChild(Node *child, int zOrder, int tag)
+void Layout::addChild(Node *child, int zOrder, int64_t tag)
 {
     if (dynamic_cast<Widget*>(child)) {
         supplyTheLayoutParameterLackToChild(static_cast<Widget*>(child));
@@ -631,6 +631,11 @@ void Layout::setBackGroundImage(const std::string& fileName,TextureResType texTy
         _backGroundImage->setPreferredSize(_backGroundImageTextureSize);
     }
     updateBackGroundImageRGBA();
+}
+
+const std::string& Layout::getBackgroundImageFileName()
+{
+    return _backGroundImageFileName;
 }
 
 void Layout::setBackGroundImageCapInsets(const Rect &capInsets)

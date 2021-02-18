@@ -60,6 +60,7 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
     private Cocos2dxEditBox mCocos2dxEditText;
 
     private boolean mSoftKeyboardShown = false;
+    private boolean mLeaveKeyboardOpen = false;
     private boolean mMultipleTouchEnabled = true;
 
     public boolean isSoftKeyboardShown() {
@@ -68,6 +69,18 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
 
     public void setSoftKeyboardShown(boolean softKeyboardShown) {
         this.mSoftKeyboardShown = softKeyboardShown;
+        if (!this.mSoftKeyboardShown)
+        {
+            this.mLeaveKeyboardOpen = false;
+        }
+    }
+
+    public boolean isLeaveKeyboardOpen() {
+        return mLeaveKeyboardOpen;
+    }
+
+    public void setLeaveKeyboardOpen(boolean open) {
+        this.mLeaveKeyboardOpen = open;
     }
 
     public boolean isMultipleTouchEnabled() {
@@ -211,11 +224,14 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
         final float[] ys = new float[pointerNumber];
 
         if (mSoftKeyboardShown){
-            InputMethodManager imm = (InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            View view = ((Activity)this.getContext()).getCurrentFocus();
-            imm.hideSoftInputFromWindow(view.getWindowToken(),0);
-            this.requestFocus();
-            mSoftKeyboardShown = false;
+            if (!mLeaveKeyboardOpen)
+            {
+                InputMethodManager imm = (InputMethodManager)this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                View view = ((Activity)this.getContext()).getCurrentFocus();
+                imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+                this.requestFocus();
+                mSoftKeyboardShown = false;
+            }
         }
 
         for (int i = 0; i < pointerNumber; i++) {

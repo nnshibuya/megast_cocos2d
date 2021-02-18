@@ -48,7 +48,7 @@ public:
     using Node::addChild;
     // add child, and add child to bone list and skeleton's sub bone map or add it to skin list
     virtual void addChild(cocos2d::Node* child, int localZOrder, const std::string &name) override;
-    virtual void addChild(cocos2d::Node* child, int localZOrder, int tag) override;
+    virtual void addChild(cocos2d::Node* child, int localZOrder, int64_t tag) override;
 
     // remove child, and remove child from bone list and skeleton's sub bone map or remove it from skin list
     virtual void removeChild(Node* child, bool cleanup) override;

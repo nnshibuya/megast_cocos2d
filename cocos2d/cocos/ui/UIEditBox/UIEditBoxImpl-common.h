@@ -91,6 +91,8 @@ public:
 
     virtual void setAnchorPoint(const Vec2& anchorPoint) override {}
     virtual void setPosition(const Vec2& pos) override {}
+    virtual void setLeaveKeyboardOpen(bool open) override {}
+    virtual void closeKeyboardWithRemoveFocus() override {}
 
     /**
      * @js NA
@@ -110,6 +112,7 @@ public:
     void editBoxEditingDidBegin();
     void editBoxEditingChanged(const std::string& text);
     void editBoxEditingDidEnd(const std::string& text, EditBoxDelegate::EditBoxEndAction action = EditBoxDelegate::EditBoxEndAction::UNKNOWN);
+    void editBoxKeyboardDone();
 
     virtual bool isEditing() override = 0;
     virtual void createNativeControl(const Rect& frame) = 0;

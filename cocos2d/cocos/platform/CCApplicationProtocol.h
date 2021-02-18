@@ -93,6 +93,8 @@ public:
     */
     virtual void applicationWillEnterForeground() = 0;
 
+    virtual void applicationWillTerminate() = 0;
+    
     /**
     * @brief    Callback by Director for limit FPS.
     * @param interval The time, expressed in seconds, between current frame and next.

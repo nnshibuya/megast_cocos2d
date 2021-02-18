@@ -234,7 +234,7 @@ void Node::cleanup()
 
 std::string Node::getDescription() const
 {
-    return StringUtils::format("<Node | Tag = %d", _tag);
+    return StringUtils::format("<Node | Tag = %lld", _tag);
 }
 
 // MARK: getters / setters

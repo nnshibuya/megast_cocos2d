@@ -28,6 +28,10 @@ import android.opengl.GLSurfaceView;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+
+/* for smartbeat */
+import com.smrtbeat.SmartBeat;
+
 public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     // ===========================================================
     // Constants
@@ -74,6 +78,7 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
         Cocos2dxRenderer.nativeInit(this.mScreenWidth, this.mScreenHeight);
         this.mLastTickInNanoSeconds = System.nanoTime();
         mNativeInitCompleted = true;
+        SmartBeat.onSurfaceCreated( 2, false);  /*  arg[2] is capture stencil buffer that availity is over android 4.3 */
     }
 
     @Override
@@ -89,7 +94,9 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
          */
 
         if (Cocos2dxRenderer.sAnimationInterval <= 1.0f / 60f * Cocos2dxRenderer.NANOSECONDSPERSECOND) {
+            SmartBeat.beginOnDrawFrame();
             Cocos2dxRenderer.nativeRender();
+            SmartBeat.endOnDrawFrame();
         } else {
             final long now = System.nanoTime();
             final long interval = now - this.mLastTickInNanoSeconds;
@@ -104,7 +111,9 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
              * Render time MUST be counted in, or the FPS will slower than appointed.
             */
             this.mLastTickInNanoSeconds = System.nanoTime();
+            SmartBeat.beginOnDrawFrame();
             Cocos2dxRenderer.nativeRender();
+            SmartBeat.endOnDrawFrame();
         }
     }
 

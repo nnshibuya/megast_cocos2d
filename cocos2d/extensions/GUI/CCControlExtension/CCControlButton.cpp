@@ -65,7 +65,7 @@ ControlButton::~ControlButton()
 
 bool ControlButton::init()
 {
-    return this->initWithLabelAndBackgroundSprite(Label::createWithSystemFont("", "Helvetica", 12), cocos2d::ui::Scale9Sprite::create(),true);
+    return this->initWithLabelAndBackgroundSprite(Label::createWithSystemFont("", "", 12), cocos2d::ui::Scale9Sprite::create(),true);
 }
 
 bool ControlButton::initWithLabelAndBackgroundSprite(Node* node, ui::Scale9Sprite* backgroundSprite, bool adjustBackGroundSize)

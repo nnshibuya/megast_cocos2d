@@ -107,6 +107,9 @@ FontFreeType::FontFreeType(bool distanceFieldEnabled /* = false */, float outlin
 , _lineHeight(0)
 , _fontAtlas(nullptr)
 , _usedGlyphs(GlyphCollection::ASCII)
+#ifndef LANG_EN
+, _ainu_fft(nullptr)
+#endif
 {
     if (outline > 0.0f)
     {
@@ -179,6 +182,19 @@ bool FontFreeType::createFontObject(const std::string &fontName, float fontSize)
     _fontRef = face;
     _lineHeight = static_cast<int>((_fontRef->size->metrics.ascender - _fontRef->size->metrics.descender) >> 6);
     
+#ifndef LANG_EN
+    //アイヌフォント対応
+    const std::string ainu_fontName = "fonts/systemfont_ainu.TTF";
+    if (_fontName != ainu_fontName)
+    {
+        _ainu_fft = FontFreeType::create(ainu_fontName, fontSize, _usedGlyphs, _customGlyphs.c_str(), _distanceFieldEnabled, _outlineSize);
+    }
+    else
+    {
+        _ainu_fft = nullptr;
+    }
+#endif
+
     // done and good
     return true;
 }
@@ -206,6 +222,13 @@ FontFreeType::~FontFreeType()
             s_cacheFontData.erase(iter);
         }
     }
+
+#ifndef LANG_EN
+    if(_ainu_fft)
+    {
+        CC_SAFE_DELETE(_ainu_fft);
+    }
+#endif
 }
 
 FontAtlas * FontFreeType::createFontAtlas()
@@ -291,6 +314,14 @@ const char* FontFreeType::getFontFamily() const
 
 unsigned char* FontFreeType::getGlyphBitmap(uint64_t theChar, long &outWidth, long &outHeight, Rect &outRect,int &xAdvance)
 {
+#ifndef LANG_EN
+    //アイヌフォント対応
+    if ((_ainu_fft) && (theChar >= 0x31f0) && (theChar <= 0x31ff))
+    {
+        return _ainu_fft->getGlyphBitmap(theChar, outWidth, outHeight, outRect, xAdvance);
+    }
+#endif
+
     bool invalidChar = true;
     unsigned char* ret = nullptr;
 
@@ -417,6 +448,14 @@ unsigned char* FontFreeType::getGlyphBitmap(uint64_t theChar, long &outWidth, lo
 
 unsigned char * FontFreeType::getGlyphBitmapWithOutline(uint64_t theChar, FT_BBox &bbox)
 {   
+#ifndef LANG_EN
+    //アイヌフォント対応
+    if ((_ainu_fft) && (theChar >= 0x31f0) && (theChar <= 0x31ff))
+    {
+        return _ainu_fft->getGlyphBitmapWithOutline(theChar, bbox);
+    }
+#endif
+
     unsigned char* ret = nullptr;
     if (FT_Load_Char(_fontRef, theChar, FT_LOAD_NO_BITMAP) == 0)
     {

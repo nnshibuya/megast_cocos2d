@@ -87,6 +87,9 @@ namespace cocos2d {
             virtual void setContentSize(const Size& size) = 0;
             virtual void setAnchorPoint(const Vec2& anchorPoint) = 0;
             
+            virtual void setLeaveKeyboardOpen(bool open){};
+            virtual void closeKeyboardWithRemoveFocus(){};
+
             /**
              * check the editbox's position, update it when needed
              */

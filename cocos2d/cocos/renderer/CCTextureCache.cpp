@@ -107,9 +107,9 @@ struct TextureCache::AsyncStruct
 public:
     AsyncStruct
     ( const std::string& fn,const std::function<void(Texture2D*)>& f,
-      const std::string& key )
+      const std::string& key, Texture2D::PixelFormat pf )
       : filename(fn), callback(f),callbackKey( key ),
-        pixelFormat(Texture2D::getDefaultAlphaPixelFormat()),
+        pixelFormat(pf),
         loadSuccess(false)
     {}
 
@@ -189,7 +189,7 @@ void TextureCache::addImageAsync(const std::string &path, const std::function<vo
  unbind the callback independently as needed whilst a call to
  unbindImageAsync(path) would be ambiguous.
  */
-void TextureCache::addImageAsync(const std::string &path, const std::function<void(Texture2D*)>& callback, const std::string& callbackKey)
+void TextureCache::addImageAsync(const std::string &path, const std::function<void(Texture2D*)>& callback, const std::string& callbackKey, Texture2D::PixelFormat const in_pf)
 {
     Texture2D *texture = nullptr;
 
@@ -228,7 +228,7 @@ void TextureCache::addImageAsync(const std::string &path, const std::function<vo
 
     // generate async struct
     AsyncStruct *data =
-      new (std::nothrow) AsyncStruct(fullpath, callback, callbackKey);
+      new (std::nothrow) AsyncStruct(fullpath, callback, callbackKey, in_pf);
     
     // add async struct into queue
     _asyncStructQueue.push_back(data);
@@ -293,7 +293,10 @@ void TextureCache::loadImage()
         ul.unlock();
 
         // load image
+        Texture2D::PixelFormat const pfCurrent( Texture2D::getDefaultAlphaPixelFormat());
+        Texture2D::setDefaultAlphaPixelFormat( asyncStruct->pixelFormat);
         asyncStruct->loadSuccess = asyncStruct->image.initWithImageFileThreadSafe(asyncStruct->filename);
+        Texture2D::setDefaultAlphaPixelFormat( pfCurrent);
 
         // ETC1 ALPHA supports.
         if (asyncStruct->loadSuccess && asyncStruct->image.getFileType() == Image::Format::ETC && !s_etc1AlphaFileSuffix.empty())

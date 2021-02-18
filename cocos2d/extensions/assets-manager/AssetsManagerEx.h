@@ -139,9 +139,9 @@ protected:
     
     std::string get(const std::string& key) const;
     
-    void initManifests(const std::string& manifestUrl);
+    virtual void initManifests(const std::string& manifestUrl);
     
-    void loadLocalManifest(const std::string& manifestUrl);
+    virtual void loadLocalManifest(const std::string& manifestUrl);
     
     void prepareLocalManifest();
     

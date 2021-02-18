@@ -369,6 +369,11 @@ bool Scene::initWithPhysics()
 
 #endif
 
+void Scene::applicationWillResignActive()
+{
+    
+}
+
 #if (CC_USE_PHYSICS || (CC_USE_3D_PHYSICS && CC_ENABLE_BULLET_INTEGRATION) || CC_USE_NAVMESH)
 void Scene::stepPhysicsAndNavigation(float deltaTime)
 {

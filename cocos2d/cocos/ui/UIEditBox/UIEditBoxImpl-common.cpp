@@ -416,6 +416,15 @@ void EditBoxImplCommon::editBoxEditingChanged(const std::string& text)
 #endif
 }
 
+void EditBoxImplCommon::editBoxKeyboardDone()
+{
+    // LOGD("editBoxTextChanged...");
+    cocos2d::ui::EditBoxDelegate *pDelegate = _editBox->getDelegate();
+    if (pDelegate != nullptr)
+    {
+        pDelegate->editBoxKeyboardDone(_editBox);
+    }
+}
 
 }
 

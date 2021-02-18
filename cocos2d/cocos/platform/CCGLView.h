@@ -401,6 +401,11 @@ public:
     const Rect& getViewPortRect() const;
     
     /**
+     * ステータスバーのサイズを取得
+     */
+    const Rect& getStatusBarRect() const;
+
+    /**
      * Get list of all active touches.
      *
      * @return A list of all active touches.
@@ -462,6 +467,8 @@ protected:
     Rect _viewPortRect;
     // the view name
     std::string _viewName;
+    // status bar rect
+    Rect _statusBarRect;
 
     float _scaleX;
     float _scaleY;

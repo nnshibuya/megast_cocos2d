@@ -263,6 +263,11 @@ Node* ImageView::getVirtualRenderer()
     return _imageRenderer;
 }
 
+void ImageView::setGlobalZOrder(float order)
+{
+    ((Scale9Sprite*)getVirtualRenderer())->setGlobalZOrder(order);
+}
+
 void ImageView::imageTextureScaleChangedWithSize()
 {
     _imageRenderer->setPreferredSize(_contentSize);

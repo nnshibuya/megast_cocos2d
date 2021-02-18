@@ -49,6 +49,7 @@ namespace ui {
 static void editBoxEditingDidBegin(int index);
 static void editBoxEditingDidChanged(int index, const std::string& text);
 static void editBoxEditingDidEnd(int index, const std::string& text, int action);
+static void editBoxKeyboardDone(int index);
 extern "C"{
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxEditBoxHelper_editBoxEditingDidBegin(JNIEnv *env, jclass, jint index) {
         editBoxEditingDidBegin(index);
@@ -62,6 +63,10 @@ extern "C"{
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxEditBoxHelper_editBoxEditingDidEnd(JNIEnv *env, jclass, jint index, jstring text, jint action) {
         std::string textString = StringUtils::getStringUTFCharsJNI(env,text);
         editBoxEditingDidEnd(index, textString, action);
+    }
+
+    JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxEditBoxHelper_editBoxKeyboardDone(JNIEnv *env, jclass, jint index) {
+        editBoxKeyboardDone(index);
     }
 }
 

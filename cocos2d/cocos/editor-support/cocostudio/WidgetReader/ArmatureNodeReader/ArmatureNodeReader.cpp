@@ -160,8 +160,8 @@ void ArmatureNodeReader::setPropsWithFlatBuffers(cocos2d::Node *node,
         
         std::string fullpath = FileUtils::getInstance()->fullPathForFilename(filepath);
         
-        std::string dirpath = fullpath.substr(0, fullpath.find_last_of('/'));
-        FileUtils::getInstance()->addSearchPath(dirpath);
+        // std::string dirpath = fullpath.substr(0, fullpath.find_last_of('/'));
+        // FileUtils::getInstance()->addSearchPath(dirpath);
         
         ArmatureDataManager::getInstance()->addArmatureFileInfo(fullpath);
         custom->init(getArmatureName(filepath));

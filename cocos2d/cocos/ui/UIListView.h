@@ -209,6 +209,8 @@ public:
      */
     void setGravity(Gravity gravity);
     
+    const Gravity& getGravity() {return _gravity;}
+    
     /**
      * Set magnetic type of ListView.
      * @see `MagneticType`
@@ -322,7 +324,7 @@ public:
     virtual void requestDoLayout() override;
     virtual void addChild(Node* child)override;
     virtual void addChild(Node * child, int localZOrder)override;
-    virtual void addChild(Node* child, int zOrder, int tag) override;
+    virtual void addChild(Node* child, int zOrder, int64_t tag) override;
     virtual void addChild(Node* child, int zOrder, const std::string &name) override;
     virtual void removeAllChildren() override;
     virtual void removeAllChildrenWithCleanup(bool cleanup) override;

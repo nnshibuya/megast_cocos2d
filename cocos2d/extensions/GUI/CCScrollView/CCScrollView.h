@@ -256,7 +256,7 @@ public:
     virtual void visit(Renderer *renderer, const Mat4 &parentTransform, uint32_t parentFlags) override;
     
     using Node::addChild;
-    virtual void addChild(Node * child, int zOrder, int tag) override;
+    virtual void addChild(Node * child, int zOrder, int64_t tag) override;
     virtual void addChild(Node * child, int zOrder, const std::string &name) override;
 
     virtual void removeAllChildren() override;
@@ -268,6 +268,14 @@ public:
     void updateTweenAction(float value, const std::string& key) override;
 
     bool hasVisibleParents() const;
+    
+    /**
+     * implements auto-scrolling behavior. change SCROLL_DEACCEL_RATE as needed to choose
+     * deacceleration speed. it must be less than 1.0f.
+     *
+     * @param dt delta
+     */
+    virtual void deaccelerateScrolling(float dt);
 protected:
     /**
      * Relocates the container at the proper offset, in bounds of max/min offsets.

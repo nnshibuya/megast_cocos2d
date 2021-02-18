@@ -175,6 +175,16 @@ public:
      */
     void setBackGroundImage(const std::string& fileName,TextureResType texType = TextureResType::LOCAL);
     
+    // kasama add
+    // 追加理由
+    // NN::ListView::convertToNNListView内で背景の情報を取得し、設定するため。
+    /**
+     *  バックグラウンドのファイルネームを取得する
+     *
+     *  @return バックグラウンドファイルネーム
+     */
+    const std::string& getBackgroundImageFileName();
+    
     /**
      * Sets a background image capinsets for layout, it only affects the scale9 enabled background image
      *

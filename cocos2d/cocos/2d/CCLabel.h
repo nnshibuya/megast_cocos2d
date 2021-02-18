@@ -454,11 +454,26 @@ public:
     void setLineBreakWithoutSpace(bool breakWithoutSpace);
 
     /**
+     * Specify what happens when a line is too long for Label.
+     *
+     * @param If the value of LineBreakWithoutSpace is false and this value is true, only when the width of one line is overflowed, the line breaks in the middle of the word.
+     */
+    void setForceOneLineBreak(bool oneLineBreak);
+
+    /**
      * Makes the Label at most this line untransformed width.
      * The Label's max line width be used for force line breaks if the value not equal zero.
      */
     void setMaxLineWidth(float maxLineWidth);
     float getMaxLineWidth() { return _maxLineWidth; }
+
+    /**
+     * Specifying the maximum number of lines.
+     * If the value is not zero, specify the maximum number of rows.
+     */
+    void setMaxLineNumber(int maxLineNumber);
+    int getMaxLineNumber() { return _maxLineNumber; }
+
     /**
      * Change font size of label type BMFONT
      * Note: This function only scale the BMFONT letter to mimic the font size change effect.
@@ -659,7 +674,7 @@ protected:
 
     bool multilineTextWrapByChar();
     bool multilineTextWrapByWord();
-    bool multilineTextWrap(const std::function<int(const std::u32string&, int, int)>& lambda);
+    bool multilineTextWrap(const std::function<int(const std::u32string&, int, int)>& lambda, bool forceOneLineBreak, int maxLineNumber);
     void shrinkLabelToContentSize(const std::function<bool(void)>& lambda);
     bool isHorizontalClamp();
     bool isVerticalClamp();
@@ -726,7 +741,9 @@ protected:
     float _additionalKerning;
     int* _horizontalKernings;
     bool _lineBreakWithoutSpaces;
+    bool _forceOneLineBreak;
     float _maxLineWidth;
+    int _maxLineNumber;
     Size _labelDimensions;
     float _labelWidth;
     float _labelHeight;

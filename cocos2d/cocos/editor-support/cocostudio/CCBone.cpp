@@ -382,6 +382,15 @@ void Bone::setLocalZOrder(int zOrder)
         Node::setLocalZOrder(zOrder);
 }
 
+void Bone::setGlobalZOrder(float zOrder)
+{
+    Node *display = _displayManager->getDisplayRenderNode();
+    if(display != nullptr)
+    {
+        display->setGlobalZOrder(zOrder);
+    }
+}
+
 Mat4 Bone::getNodeToArmatureTransform() const
 {
     return _worldTransform;

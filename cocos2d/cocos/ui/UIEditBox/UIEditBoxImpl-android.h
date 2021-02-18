@@ -53,7 +53,8 @@ public:
      * @lua NA
      */
     virtual ~EditBoxImplAndroid();
-    
+    virtual void setLeaveKeyboardOpen(bool open) override;
+    virtual void closeKeyboardWithRemoveFocus() override;
 
     virtual bool isEditing() override;
     virtual void createNativeControl(const Rect& frame) override;

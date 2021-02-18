@@ -145,7 +145,7 @@ void ParticleBatchNode::visit(Renderer *renderer, const Mat4 &parentTransform, u
 }
 
 // override addChild:
-void ParticleBatchNode::addChild(Node * aChild, int zOrder, int tag)
+void ParticleBatchNode::addChild(Node * aChild, int zOrder, int64_t tag)
 {
     CCASSERT( aChild != nullptr, "Argument must be non-nullptr");
     CCASSERT( dynamic_cast<ParticleSystem*>(aChild) != nullptr, "CCParticleBatchNode only supports QuadParticleSystems as children");

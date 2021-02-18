@@ -521,7 +521,7 @@ void ScrollView::updateInset()
 /**
  * make sure all children go to the container
  */
-void ScrollView::addChild(Node * child, int zOrder, int tag)
+void ScrollView::addChild(Node * child, int zOrder, int64_t tag)
 {
     if (_container != child) {
         _container->addChild(child, zOrder, tag);

@@ -526,7 +526,7 @@ public:
     virtual void removeAllChildrenWithCleanup(bool cleanup) override;
     virtual void reorderChild(Node *child, int zOrder) override;
     using Node::addChild;
-    virtual void addChild(Node *child, int zOrder, int tag) override;
+    virtual void addChild(Node *child, int zOrder, int64_t tag) override;
     virtual void addChild(Node *child, int zOrder, const std::string &name) override;
     virtual void sortAllChildren() override;
     virtual void setScale(float scale) override;

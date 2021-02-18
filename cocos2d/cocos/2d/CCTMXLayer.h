@@ -286,7 +286,7 @@ public:
      @warning addChild(z, tag); is not supported on TMXLayer. Instead of setTileGID.
      */
     using SpriteBatchNode::addChild;
-    virtual void addChild(Node * child, int zOrder, int tag) override;
+    virtual void addChild(Node * child, int zOrder, int64_t tag) override;
     // super method
     void removeChild(Node* child, bool cleanup) override;
     /**

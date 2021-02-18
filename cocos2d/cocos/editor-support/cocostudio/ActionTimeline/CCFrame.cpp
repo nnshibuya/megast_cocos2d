@@ -816,6 +816,11 @@ void EventFrame::setNode(cocos2d::Node* node)
 
 void EventFrame::onEnter(Frame* /*nextFrame*/, int currentFrameIndex)
 {
+    //西村追加
+    if(_action == nullptr){
+        return;
+    }
+
     if (static_cast<int>(_frameIndex) < _action->getStartFrame() || static_cast<int>(_frameIndex) > _action->getEndFrame())
         return;
 

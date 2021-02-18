@@ -2853,4 +2853,70 @@ ActionFloat* ActionFloat::reverse() const
     return ActionFloat::create(_duration, _to, _from, _callback);
 }
 
+//
+// AdditionTo
+//カスタムシェーダー"shaders/vert_standard.vsh", "shaders/addition.fsh"がセットされている時のみ有効
+AdditionTo* AdditionTo::create(float duration, GLubyte fromred, GLubyte fromgreen, GLubyte fromblue, GLubyte tored, GLubyte togreen, GLubyte toblue)
+{
+    AdditionTo *tintTo = new (std::nothrow) AdditionTo();
+    tintTo->initWithDuration(duration, fromred, fromgreen, fromblue, tored, togreen, toblue);
+    tintTo->autorelease();
+    
+    return tintTo;
+}
+
+AdditionTo* AdditionTo::create(float duration,const Color3B& from, const Color3B& to)
+{
+    return create(duration,from.r, from.g, from.b, to.r, to.g, to.b);
+}
+
+bool AdditionTo::initWithDuration(float duration, GLubyte fromred, GLubyte fromgreen, GLubyte fromblue, GLubyte tored, GLubyte togreen, GLubyte toblue)
+{
+    if (ActionInterval::initWithDuration(duration))
+    {
+        _to = Color3B(tored, togreen, toblue);
+        _from = Color3B(fromred, fromgreen,fromblue);
+        return true;
+    }
+    
+    return false;
+}
+
+AdditionTo* AdditionTo::clone() const
+{
+    // no copy constructor
+    auto a = new (std::nothrow) AdditionTo();
+    a->initWithDuration(_duration,_from.r, _from.g, _from.b, _to.r, _to.g, _to.b);
+    a->autorelease();
+    return a;
+}
+
+AdditionTo* AdditionTo::reverse() const
+{
+    CCASSERT(false, "reverse() not supported in AdditionTo");
+    return nullptr;
+}
+
+void AdditionTo::startWithTarget(Node *target)
+{
+    ActionInterval::startWithTarget(target);
+    if (_target)
+    {
+
+    }
+    /*_from = target->getColor();*/
+}
+
+void AdditionTo::update(float time)
+{
+    if (_target && _target->getGLProgramState())
+    {
+        Vec4 col = Vec4(GLubyte(_from.r + (_to.r - _from.r) * time),
+                        (GLubyte)(_from.g + (_to.g - _from.g) * time),
+                        (GLubyte)(_from.b + (_to.b - _from.b) * time),
+                        0);
+        _target->getGLProgramState()->setUniformVec4("color_v4", col / 255);
+    }
+}
+
 NS_CC_END

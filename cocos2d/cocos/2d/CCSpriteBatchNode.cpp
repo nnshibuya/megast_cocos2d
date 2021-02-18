@@ -175,7 +175,7 @@ void SpriteBatchNode::visit(Renderer *renderer, const Mat4 &parentTransform, uin
     }
 }
 
-void SpriteBatchNode::addChild(Node *child, int zOrder, int tag)
+void SpriteBatchNode::addChild(Node *child, int zOrder, int64_t tag)
 {
     CCASSERT(child != nullptr, "child should not be null");
     CCASSERT(dynamic_cast<Sprite*>(child) != nullptr, "CCSpriteBatchNode only supports Sprites as children");

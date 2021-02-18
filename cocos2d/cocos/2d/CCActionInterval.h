@@ -1680,6 +1680,54 @@ private:
     CC_DISALLOW_COPY_AND_ASSIGN(ActionFloat);
 };
 
+//k-sasaki
+//加算シェーダー用アクション
+class CC_DLL AdditionTo : public ActionInterval
+{
+public:
+    /**
+     * Creates an action with duration and color.
+     * @param duration Duration time, in seconds.
+     * @param red Red Color, from 0 to 255.
+     * @param green Green Color, from 0 to 255.
+     * @param blue Blue Color, from 0 to 255.
+     * @return An autoreleased TintTo object.
+     */
+    static AdditionTo* create(float duration, GLubyte fromred, GLubyte fromgreen, GLubyte fromblue, GLubyte tored, GLubyte togreen, GLubyte toblue);
+    /**
+     * Creates an action with duration and color.
+     * @param duration Duration time, in seconds.
+     * @param color It's a Color3B type.
+     * @return An autoreleased TintTo object.
+     */
+    static AdditionTo* create(float duration,const Color3B& from, const Color3B& to);
+    
+    //
+    // Overrides
+    //
+    virtual AdditionTo* clone() const override;
+    virtual AdditionTo* reverse(void) const override;
+    virtual void startWithTarget(Node *target) override;
+    /**
+     * @param time In seconds.
+     */
+    virtual void update(float time) override;
+    
+CC_CONSTRUCTOR_ACCESS:
+    AdditionTo() {}
+    virtual ~AdditionTo() {}
+    
+    /** initializes the action with duration and color */
+    bool initWithDuration(float duration, GLubyte fromred, GLubyte fromgreen, GLubyte fromblue, GLubyte red, GLubyte green, GLubyte blue);
+    
+protected:
+    Color3B _to;
+    Color3B _from;
+    
+private:
+    CC_DISALLOW_COPY_AND_ASSIGN(AdditionTo);
+};
+
 // end of actions group
 /// @}
 

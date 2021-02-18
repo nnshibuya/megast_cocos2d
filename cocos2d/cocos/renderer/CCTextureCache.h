@@ -125,7 +125,7 @@ public:
     */
     virtual void addImageAsync(const std::string &filepath, const std::function<void(Texture2D*)>& callback);
     
-    void addImageAsync(const std::string &path, const std::function<void(Texture2D*)>& callback, const std::string& callbackKey );
+    void addImageAsync(const std::string &path, const std::function<void(Texture2D*)>& callback, const std::string& callbackKey, Texture2D::PixelFormat const in_pf = Texture2D::getDefaultAlphaPixelFormat() );
 
     /** Unbind a specified bound image asynchronous callback.
      * In the case an object who was bound to an image asynchronous callback was destroyed before the callback is invoked,
@@ -219,6 +219,10 @@ public:
     */
     void renameTextureWithKey(const std::string& srcName, const std::string& dstName);
 
+    // テクスチャ数を取得
+    int getTextures(){
+        return (int)_textures.size();
+    }
 
 private:
     void addImageAsyncCallBack(float dt);

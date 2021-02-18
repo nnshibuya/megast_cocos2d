@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 Copyright (c) 2013-2016 Chukong Technologies Inc.
 Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
@@ -147,6 +147,7 @@ public:
     void updateZOrder();
 
     virtual void setLocalZOrder(int zOrder) override;
+    virtual void setGlobalZOrder(float zOrder) override;
 
     Tween *getTween();
 

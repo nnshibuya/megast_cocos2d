@@ -840,6 +840,15 @@ public:
      */
     bool isLayoutComponentEnabled()const;
 
+    /**
+        t-harada 20150730　v3.6時追加
+        onTouchBegan()の中で行われているタッチ判定処理が必要になりました。
+     　　（・OutGameSceneでは複数のオブジェクトが隠れて存在しているので、それらのヒットを無視するため。）
+        Widget::onTouchBegan() の中からメソッドとして分離コピペ
+        １、タッチを受け付ける状態にある　＆＆　自身の領域内をタッチされた場合 == true
+     */
+    bool isHitOnTouchEnabled(Touch *touch, Event *unusedEvent);
+
 CC_CONSTRUCTOR_ACCESS:
 
     //initializes state of widget.

@@ -241,7 +241,15 @@ std::string FileUtilsApple::getWritablePath() const
     }
 
     // save to document folder
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    //  * NSCachesDirectoryに変更  t-harada
+    //  * 理由： http://blog.syuhari.jp/archives/2363
+    NSArray *paths;
+#if defined(COCOS2D_DEBUG)
+    paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+#else
+    paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+#endif
+
     NSString *documentsDirectory = [paths objectAtIndex:0];
     std::string strRet = [documentsDirectory UTF8String];
     strRet.append("/");

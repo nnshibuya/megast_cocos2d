@@ -307,10 +307,11 @@ void GLView::handleTouchesBegin(int num, intptr_t ids[], float xs[], float ys[])
         x = xs[i];
         y = ys[i];
 
-        auto iter = g_touchIdReorderMap.find(id);
+        // auto iter = g_touchIdReorderMap.find(id);
 
         // it is a new touch
-        if (iter == g_touchIdReorderMap.end())
+        // touchIdのMapが空の時だけタッチIDを登録
+        if (g_touchIdReorderMap.empty())
         {
             unusedIndex = getUnUsedIndex();
 
@@ -328,6 +329,16 @@ void GLView::handleTouchesBegin(int num, intptr_t ids[], float xs[], float ys[])
             
             g_touchIdReorderMap.emplace(id, unusedIndex);
             touchEvent._touches.push_back(touch);
+            
+            if (touchEvent._touches.size() == 0)
+            {
+                CCLOG("touchesBegan: size = 0");
+                return;
+            }
+            
+            touchEvent._eventCode = EventTouch::EventCode::BEGAN;
+            auto dispatcher = Director::getInstance()->getEventDispatcher();
+            dispatcher->dispatchEvent(&touchEvent);
         }
     }
 
@@ -472,6 +483,11 @@ void GLView::handleTouchesCancel(int num, intptr_t ids[], float xs[], float ys[]
 const Rect& GLView::getViewPortRect() const
 {
     return _viewPortRect;
+}
+
+const Rect& GLView::getStatusBarRect() const
+{
+    return _statusBarRect;
 }
 
 std::vector<Touch*> GLView::getAllTouches() const

@@ -69,6 +69,11 @@ public class Cocos2dxEditBoxHelper {
         editBoxEditingDidEnd(index, text, action);
     }
 
+    private static native void editBoxKeyboardDone(int index);
+    public static void __editBoxKeyboardDone(int index){
+        editBoxKeyboardDone(index);
+    }
+    
 
     public Cocos2dxEditBoxHelper(ResizeLayout layout) {
         Cocos2dxEditBoxHelper.mFrameLayout = layout;
@@ -187,6 +192,18 @@ public class Cocos2dxEditBoxHelper {
                         // If the event is a key-down event on the "enter" button
                         if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                                 (keyCode == KeyEvent.KEYCODE_ENTER)) {
+
+                            //キーボードオープンしっぱなしの場合はcloseKeyboardしない
+                            if (mCocos2dxActivity.getGLSurfaceView().isLeaveKeyboardOpen()) {
+                                mCocos2dxActivity.runOnGLThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Cocos2dxEditBoxHelper.__editBoxKeyboardDone(index);
+                                    }
+                                });
+                                return false;
+                            }
+
                             //if editbox doesn't support multiline, just hide the keyboard
                             if ((editBox.getInputType() & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != InputType.TYPE_TEXT_FLAG_MULTI_LINE) {
                                 Cocos2dxEditBoxHelper.closeKeyboardOnUiThread(index);
@@ -202,6 +219,18 @@ public class Cocos2dxEditBoxHelper {
                     @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                         if (actionId == EditorInfo.IME_ACTION_NEXT) {
+
+                            //キーボードオープンしっぱなしの場合はcloseKeyboardしない
+                            if (mCocos2dxActivity.getGLSurfaceView().isLeaveKeyboardOpen()) {
+                                mCocos2dxActivity.runOnGLThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Cocos2dxEditBoxHelper.__editBoxKeyboardDone(index);
+                                    }
+                                });
+                                return false;
+                            }
+
                             editBox.endAction = Cocos2dxEditBox.kEndActionNext;
                             Cocos2dxEditBoxHelper.closeKeyboardOnUiThread(index);
                             return true;

@@ -103,6 +103,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
     CGRect                  originalRect_;
     NSNotification*         keyboardShowNotification_;
     BOOL                    isKeyboardShown_;
+    BOOL                    isLeaveKeyboardOpen_;
 }
 
 @property(nonatomic, readonly) UITextPosition *beginningOfDocument;
@@ -113,6 +114,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 @property(readwrite, copy) UITextRange *selectedTextRange;
 @property(nonatomic, readonly) id<UITextInputTokenizer> tokenizer;
 @property(nonatomic, readonly, getter = isKeyboardShown) BOOL isKeyboardShown;
+@property(nonatomic, readonly, getter = isLeaveKeyboardOpen) BOOL isLeaveKeyboardOpen;
 @property(nonatomic, copy) NSNotification* keyboardShowNotification;
 @property(nonatomic) UITextAutocorrectionType autocorrectionType;         // default is UITextAutocorrectionTypeDefault
 
@@ -154,9 +156,11 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 -(int) getWidth;
 -(int) getHeight;
+-(CGRect) getStatusBarRect;
 
 -(void) doAnimationWhenKeyboardMoveWithDuration:(float) duration distance:(float) dis;
 -(void) doAnimationWhenAnotherEditBeClicked;
+-(void) setLeaveKeyboardOpen:(BOOL)open;
 @end
 
 #endif // CC_PLATFORM_IOS

@@ -129,6 +129,8 @@ bool GLViewImpl::initWithEAGLView(void *eaglview)
 
     _screenSize.width = _designResolutionSize.width = [glview getWidth];
     _screenSize.height = _designResolutionSize.height = [glview getHeight];
+    CGRect rect = [glview getStatusBarRect];
+    _statusBarRect.setRect(rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 //    _scaleX = _scaleY = [glview contentScaleFactor];
 
     return true;

@@ -61,6 +61,7 @@ class EventListenerCustom;
 class TextureCache;
 class Renderer;
 class Camera;
+class Sprite;
 
 class Console;
 namespace experimental
@@ -261,6 +262,12 @@ public:
      * Returns safe area rectangle of the OpenGL view in points.
      */
     Rect getSafeAreaRect() const;
+
+    /** ステータスバーを除いた描画領域のサイズを取得 */
+    Size getViewPortSize() const;
+    
+    /** ステータスバーのRectを取得 */
+    Rect getStatusBarRect() const;
 
     /**
      * Converts a screen coordinate to an OpenGL coordinate.
@@ -665,6 +672,7 @@ protected:
     float _accumDt = 0.0f;
     float _frameRate = 0.0f;
     
+    Sprite*_FPSprite;
     LabelAtlas *_FPSLabel = nullptr;
     LabelAtlas *_drawnBatchesLabel = nullptr;
     LabelAtlas *_drawnVerticesLabel = nullptr;
@@ -724,6 +732,11 @@ protected:
 
     // GLView will recreate stats labels to fit visible rect
     friend class GLView;
+
+    //メモリ収集用メソッド
+    static double getAvailableBytes();
+    static double getAvailableKiloBytes();
+    static double getAvailableMegaBytes();
 };
 
 // FIXME: Added for backward compatibility in case

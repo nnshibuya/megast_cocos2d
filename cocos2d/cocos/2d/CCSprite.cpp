@@ -123,9 +123,10 @@ Sprite* Sprite::createWithSpriteFrameName(const std::string& spriteFrameName)
 #if COCOS2D_DEBUG > 0
     char msg[256] = {0};
     sprintf(msg, "Invalid spriteFrameName: %s", spriteFrameName.c_str());
-    CCASSERT(frame != nullptr, msg);
+    // CCASSERT(frame != nullptr, msg);
 #endif
-
+    //k-sasaki見つからなかったらNULLを返すようにする
+    if(!frame)return nullptr;
     return createWithSpriteFrame(frame);
 }
 
@@ -1111,7 +1112,7 @@ void Sprite::draw(Renderer *renderer, const Mat4 &transform, uint32_t flags)
 
 // MARK: visit, draw, transform
 
-void Sprite::addChild(Node *child, int zOrder, int tag)
+void Sprite::addChild(Node *child, int zOrder, int64_t tag)
 {
     CCASSERT(child != nullptr, "Argument must be non-nullptr");
     if (child == nullptr)

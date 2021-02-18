@@ -154,3 +154,23 @@ void conversionEncodingJNI(const char* src, int byteSize, const char* fromCharse
         methodInfo.env->DeleteLocalRef(methodInfo.classID);
     }
 }
+
+void setLeaveKeyboardOpenJNI(bool open)
+{
+    JniMethodInfo t;
+
+    if (JniHelper::getStaticMethodInfo(t, className.c_str(), "setLeaveKeyboardOpen", "(Z)V")) {
+        t.env->CallStaticVoidMethod(t.classID, t.methodID, open);
+        t.env->DeleteLocalRef(t.classID);
+    }
+}
+
+void closeKeyboardWithRemoveFocusJNI()
+{
+    JniMethodInfo t;
+
+    if (JniHelper::getStaticMethodInfo(t, className.c_str(), "closeKeyboardWithRemoveFocus", "()V")) {
+        t.env->CallStaticVoidMethod(t.classID, t.methodID);
+        t.env->DeleteLocalRef(t.classID);
+    }
+}

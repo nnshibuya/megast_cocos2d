@@ -98,6 +98,8 @@ namespace ui {
          * @param type The reason why editing ended.
          */
         virtual void editBoxEditingDidEndWithAction(EditBox* /*editBox*/, EditBoxEndAction /*action*/) {}
+        
+        virtual void editBoxKeyboardDone(EditBox* editBox) {};
     };
 
     /**

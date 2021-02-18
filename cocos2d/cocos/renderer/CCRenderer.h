@@ -221,13 +221,18 @@ protected:
     //Draw the previews queued triangles and flush previous context
     void flush();
     
+public:
     void flush2D();
-    
+protected:
+
     void flush3D();
 
     void flushTriangles();
 
+public:
     void processRenderCommand(RenderCommand* command);
+    
+protected:
     void visitRenderQueue(RenderQueue& queue);
 
     void fillVerticesAndIndices(const TrianglesCommand* cmd);
